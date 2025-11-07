@@ -12,6 +12,11 @@
   --font-mono: var(--font-geist-mono);
 }
 
+
+@theme {
+  --custom-gray: #D9AB83;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -23,4 +28,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.bg-custom-gray {
+  background-color:#D9AB83
 }
