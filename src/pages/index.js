@@ -2,7 +2,7 @@
 import FollowInstagram from "@/components/FollowInstagram";
 import GoalPackProduct from "@/components/GoalPackProduct";
 import HeroSection from "@/components/HeroSection";
-import OurServices from "@/components/Ourservices";
+import OurServices from "@/components/OurServices";
 import ProductCardDemo from "@/components/ProductCard";
 import { useState } from "react";
 
