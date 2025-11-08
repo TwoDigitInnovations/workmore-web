@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { Api } from '@/services/service';
 import { useRouter } from 'next/router';
+import { userContext } from './_app';
 
-function ModernSignIn() {
-    const router = useRouter()
+function ModernSignIn(props) {
+    const router = useRouter();
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
+    const [user, setUser] = useContext(userContext)
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -41,24 +44,68 @@ function ModernSignIn() {
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    const submit = (e) => {
         e.preventDefault();
         const newErrors = validateForm();
-
-        if (Object.keys(newErrors).length === 0) {
-            console.log('Form submitted:', formData);
-            alert('Login successful!');
-        } else {
+        if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
+            return;
         }
+
+        const data = {
+            username: formData.email.toLowerCase(),
+            password: formData.password,
+        };
+
+        props?.loader?.(true);
+
+        Api("post", "login", data, router).then(
+            (res) => {
+                props?.loader?.(false);
+
+                if (res?.status) {
+                    const userData = res.data;
+
+                    if (userData.status === "Suspended") {
+                        props?.toaster?.({
+                            type: "error",
+                            message:
+                                "Your account has been suspended by our team. Please contact support.",
+                        });
+                        return;
+                    }
+                    props?.toaster?.({
+                        type: "success",
+                        message: "You are successfully logged in",
+                    });
+                    router.push("/");
+                    localStorage.setItem("userDetail", JSON.stringify(userData));
+                    localStorage.setItem("token", userData.token);
+                    setUser(userData);
+                    setFormData({ email: "", password: "" });
+                } else {
+                    props?.toaster?.({
+                        type: "error",
+                        message: res?.data?.message || "Login failed",
+                    });
+                }
+            },
+            (err) => {
+                props?.loader?.(false);
+                props?.toaster?.({
+                    type: "error",
+                    message: err?.data?.message || err?.message || "Something went wrong",
+                });
+            }
+        );
     };
 
     return (
-        <div className="pb-10 md:mt-18 mt-10 bg-gradient-to-t from-[#f5f5dc] via-[#f5f5dc] to-white ">
-            <div className='max-w-7xl Shodow-lg flex w-full mx-auto border-2  border-blue-50 rounded-4xl'>
-                <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white rounded-4xl">
+        <div className="md:min-h-[650px] pb-10 md:mt-18 mt-10 bg-gradient-to-t from-[#f5f5dc] via-[#f5f5dc] to-white px-4 flex items-center justify-center min-h-[750px]">
+            <div className='max-w-7xl Shodow-lg flex w-full mx-auto border-2 border-blue-50 rounded-4xl'>
+                <div className="w-full md:w-1/2 flex items-center justify-center md:p-8 p-3 bg-white rounded-4xl">
                     <div className="w-full max-w-md">
-                        <div className="bg-white rounded-2xl  p-8 ">
+                        <div className="bg-white rounded-2xl md:p-8 p-2">
                             <h1 className="text-3xl font-bold text-gray-800 mb-8">Login</h1>
                             <div className="space-y-6">
                                 <div>
@@ -121,10 +168,12 @@ function ModernSignIn() {
 
                                 <button
                                     type="submit"
+                                    onClick={submit}
                                     className="w-full bg-black text-white py-3 rounded-full font-semibold hover:bg-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-lg cursor-pointer"
                                 >
                                     Login
                                 </button>
+
                                 <p className="text-black text-center">
                                     Don't have an account?{" "}
                                     <span
@@ -134,12 +183,10 @@ function ModernSignIn() {
                                         Register now
                                     </span>
                                 </p>
-
                             </div>
                         </div>
                     </div>
                 </div>
-
 
                 <div className="w-1/2 relative md:flex hidden">
                     <div
@@ -149,12 +196,13 @@ function ModernSignIn() {
                         }}
                     ></div>
 
-
                     <div className="absolute top-16 right-10 flex flex-col items-end justify-center z-10 text-center px-4">
                         <h1 className="text-6xl font-bold text-black mb-4 drop-shadow-2xl">
                             Welcome
                         </h1>
-                        <h2 className="text-6xl font-bold text-white drop-shadow-2xl text-left">Back!</h2>
+                        <h2 className="text-6xl font-bold text-white drop-shadow-2xl text-left">
+                            Back!
+                        </h2>
                     </div>
                 </div>
             </div>

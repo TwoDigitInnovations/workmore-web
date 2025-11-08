@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { Api } from '@/services/service';
+import { useRouter } from 'next/router';
 
-function ModernSignIn() {
+function Signup(props) {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         name: ''
     });
+    const router = useRouter()
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -27,16 +30,29 @@ function ModernSignIn() {
 
     const validateForm = () => {
         const newErrors = {};
-        if (!formData.email) {
+
+        // Name validation
+        if (!formData.name.trim()) {
+            newErrors.name = 'Name is required';
+        } else if (formData.name.length < 3) {
+            newErrors.name = 'Name must be at least 3 characters';
+        }
+
+        // Email validation
+        if (!formData.email.trim()) {
             newErrors.email = 'Email is required';
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = 'Invalid email format';
         }
 
-        if (!formData.password) {
+        // Password validation
+        if (!formData.password.trim()) {
             newErrors.password = 'Password is required';
+        } else if (formData.password.length < 6) {
+            newErrors.password = 'Password must be at least 6 characters';
         }
 
+        setErrors(newErrors);
         return newErrors;
     };
 
@@ -44,20 +60,51 @@ function ModernSignIn() {
         e.preventDefault();
         const newErrors = validateForm();
 
-        if (Object.keys(newErrors).length === 0) {
-            console.log('Form submitted:', formData);
-            alert('Login successful!');
-        } else {
-            setErrors(newErrors);
+        // stop submit if errors exist
+        if (Object.keys(newErrors).length > 0) {
+            return;
         }
+
+        props?.loader?.(true);
+        const data = {
+            email: formData.email.toLowerCase(),
+            username: formData.name,
+            password: formData.password,
+            type: "USER",
+        };
+
+        Api("post", "signUp", data, router).then(
+            (res) => {
+                props?.loader?.(false);
+                if (res?.success) {
+                    router.push("/Signin");
+                    props?.toaster?.({
+                        type: "success",
+                        message: "Registered successfully",
+                    });
+                } else {
+                    props?.toaster?.({
+                        type: "error",
+                        message: res?.data?.message || "Registration failed",
+                    });
+                }
+            },
+            (err) => {
+                props?.loader?.(false);
+                props?.toaster?.({
+                    type: "error",
+                    message: err?.message || "Something went wrong",
+                });
+            }
+        );
     };
 
     return (
-        <div className="md:min-h-screen md:mt-18 mt-20 md:mx-0   bg-gradient-to-t from-[#f5f5dc] via-[#f5f5dc] to-white md:mb-0 pb-20">
-            <div className='max-w-7xl Shodow-lg  flex w-full mx-auto border-2 border-gray-300 rounded-4xl'>
-                <div className="w-full md:w-1/2 flex items-center justify-center bg-white rounded-4xl md:p-8 p-3">
-                    <div className="w-full max-w-md">
-                        <div className="bg-white rounded-2xl  p-8 ">
+        <div className="md:min-h-[650px] md:mt-18 mt-20   bg-gradient-to-t from-[#f5f5dc] via-[#f5f5dc] to-white md:mb-0 pb-20 flex items-center justify-center min-h-[750px]">
+            <div className='max-w-7xl Shodow-lg flex w-full md:mx-auto border-2 border-gray-300 rounded-4xl mx-4'>
+                <div className="w-full md:w-1/2 flex items-center justify-center bg-white rounded-4xl md:p-8 p-4 ">
+                    <div className="w-full md:max-w-md">
+                        <div className="bg-white rounded-2xl  md:p-8 p-2 ">
                             <h1 className="text-3xl font-bold text-gray-800 mb-8">Sign Up</h1>
                             <div className="space-y-4">
                                 <div>
@@ -105,7 +152,7 @@ function ModernSignIn() {
                                             name="password"
                                             value={formData.password}
                                             onChange={handleChange}
-                                            placeholder="••••••••"
+                                            placeholder="**********"
                                             className={`w-full px-4 py-3 text-black pr-12 border rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 ${errors.password ? 'border-red-500 bg-red-50' : 'border-gray-300'
                                                 }`}
                                         />
@@ -128,6 +175,7 @@ function ModernSignIn() {
 
                                 <button
                                     type="submit"
+                                    onClick={handleSubmit}
                                     className="w-full bg-black text-white py-3 rounded-full font-semibold hover:bg-gray-800 transition-all duration-300 transform hover:scale-[1.02] shadow-lg cursor-pointer"
                                 >
                                     Sign up
@@ -159,4 +207,4 @@ function ModernSignIn() {
     );
 }
 
-export default ModernSignIn;
+export default Signup;

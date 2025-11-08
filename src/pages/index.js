@@ -4,23 +4,26 @@ import GoalPackProduct from "@/components/GoalPackProduct";
 import HeroSection from "@/components/HeroSection";
 import OurServices from "@/components/Ourservices";
 import ProductCardDemo from "@/components/ProductCard";
+import { useState } from "react";
 
 function Home(props) {
 
   const Images = ["/review1.png", "review2.png", "review3.png"]
 
+ 
+
   return (
     <div className="min-h-screen">
       <HeroSection />
-      {/* <div className="max-w-7xl mx-auto mt-10 py-8 px-4" >
-        <p className="text-black md:text-xl text-lg  text-center font-semibold"> Our Best Sellers </p>
+      <div className="max-w-7xl mx-auto mt-10 py-8 px-4" >
+        <p className="text-black text-2xl text-center font-semibold"> Our Best Sellers </p>
         <section className="md:mt-10 mt-7">
 
           <ProductCardDemo
             loader={props.loader}
           />
         </section>
-      </div> */}
+      </div>
       <div className="max-w-7xl mx-auto mt-10 py-8 px-4" >
         <p className="text-black text-center font-extrabold mb-8 text-2xl"> Our Services</p>
         <OurServices />

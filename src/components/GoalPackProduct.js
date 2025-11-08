@@ -2,8 +2,8 @@ import React, { useState } from "react";
 
 export default function GoalPackProduct() {
     const categories = [
-        { id: 1, name: "Challenge 21D" },
-        { id: 2, name: "Flat Stomach" },
+        { id: 1, name: "Flat Stomach" },
+        { id: 2, name: "Challenge 21D" },
         { id: 3, name: "Fat Burner" },
         { id: 4, name: "Beauty Glow" },
         { id: 5, name: "Perfect Sleep" },
@@ -31,7 +31,7 @@ export default function GoalPackProduct() {
         },
     ];
 
-    const [selectedCategory, setSelectedCategory] = useState("Challenge 21D");
+    const [selectedCategory, setSelectedCategory] = useState("Flat Stomach");
 
     const filteredProducts =
         selectedCategory === "Chalenge 21D"

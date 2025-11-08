@@ -1,150 +1,75 @@
-import React, { useState } from "react";
-import { Heart, ShoppingCart } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Api } from "@/services/service";
+import { useRouter } from "next/router";
+import constant from "../../services/constant";
 
 const ProductCard = ({ item }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
-  };
-
-  const sampleProduct = {
-    name: "Slim Cafe",
-    image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=300&h=200&fit=crop",
-    price: 19.90,
-    rating: 4.0,
-
-  };
-
-  const product = item || sampleProduct;
+  const product = item || {};
+  const router = useRouter();
 
   return (
-    <div
-      className="bg-white w-full md:w-[250px] md:h-[300px] h-[300px] rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 max-w-sm mx-auto relative overflow-hidden border border-gray-100"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className="bg-white w-full md:w-[280px] rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 max-w-sm mx-auto relative overflow-hidden border border-gray-100">
+      <div className="w-full flex flex-col justify-center items-center relative">
 
-      <button
-        onClick={toggleFavorite}
-        className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-200"
-      >
-        <Heart
-          className={`w-5 h-5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400 hover:text-red-500'
-            }`}
+        <img
+          src={product.image || "/image32.png"}
+          alt={product.name}
+          className="md:w-[280px] w-fit h-full cursor-pointer object-contain rounded-xl transition-transform duration-300 hover:scale-105"
+          onClick={() => router.push(`/product-details/${item.slug}`)}
         />
-      </button>
 
-
-      <div className="relative  pb-0">
-        <div className="relative  rounded-xl mb-4">
-          <img
-            src={product.image}
-            alt={product.name}
-            className={`w-full h-44 object-contain mx-auto transition-all duration-300 ${isHovered ? 'scale-90' : 'scale-100'
-              }`}
-          />
-
-
-          <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
-            }`}>
-            <button className="bg-orange-500 text-white px-6 py-2 rounded-full font-medium hover:bg-orange-600 transition-colors flex items-center gap-2 shadow-lg">
-              <ShoppingCart className="w-4 h-4" />
-              Add to Cart
-            </button>
-          </div>
+        <div className="absolute top-3 left-3 bg-black text-white text-xs px-3 py-1 rounded-full">
+          {product?.name || "Category"}
         </div>
-      </div>
+
+        <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded-2xl text-lg font-bold text-black flex items-center justify-center gap-2 shadow-sm">
+
+          <span className="text-black md:text-base text-lg font-semibold">
+            {constant.currency} {product?.price_slot?.[0]?.our_price?.toFixed(2) || "0.00"}
+          </span>
 
 
-      <div className="px-4 pb-4">
-
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-sm text-gray-600">Ratings</span>
-          <span className="font-semibold text-gray-800">{product.rating}</span>
-          <div className="flex items-center">
-            <span className="text-yellow-400 text-lg">★</span>
-          </div>
-
-        </div>
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold md:text-lg  text-gray-800 mb-3">
-            {product.name}
-          </h3>
-          <p className="md:text-lg font-bold text-gray-800">
-            €{product.price}
-          </p>
+          {product?.price_slot?.[0]?.other_price && (
+            <span className="text-gray-500 md:text-base text-lg line-through">
+              {constant.currency} {product?.price_slot?.[0]?.other_price?.toFixed(2)}
+            </span>
+          )}
         </div>
       </div>
     </div>
+
   );
 };
 
-
 const ProductCardDemo = () => {
-  const products = [
-    {
-      name: "Slim Cafe",
-      image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=300&h=200&fit=crop",
-      price: 19.90,
-      rating: 4.0,
+  const router = useRouter();
+  const [productList, setProductList] = useState([]);
+  const [pageNum, setPageNum] = useState(1);
 
-    },
-    {
-      name: "Green Tea Detox",
-      image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=200&fit=crop",
-      price: 24.90,
-      rating: 4.2,
+  useEffect(() => {
+    getProduct();
+  }, [pageNum]);
 
-    },
-    {
-      name: "Protein Power",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop",
-      price: 32.50,
-      rating: 4.5,
-
-    },
-    {
-      name: "Protein Power",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop",
-      price: 32.50,
-      rating: 4.5,
-
-    },
-    {
-      name: "Protein Power",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop",
-      price: 32.50,
-      rating: 4.5,
-
-    },
-    {
-      name: "Protein Power",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop",
-      price: 32.50,
-      rating: 4.5,
-
-    },
-    {
-      name: "Protein Power",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop",
-      price: 32.50,
-      rating: 4.5,
-
-    }, {
-      name: "Protein Power",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop",
-      price: 32.50,
-      rating: 4.5,
-
-    }, 
-  ];
+  const getProduct = async () => {
+    try {
+      const res = await Api(
+        "get",
+        `getTopSoldProduct?page=${pageNum}&limit=16`,
+        null,
+        router
+      );
+      if (res?.status) {
+        setProductList(res.data);
+      }
+    } catch (error) {
+      console.error("Error fetching top sold products:", error);
+    }
+  };
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-        {products.map((product, index) => (
+    <div className="min-h-screen ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        {productList.map((product, index) => (
           <ProductCard key={index} item={product} />
         ))}
       </div>

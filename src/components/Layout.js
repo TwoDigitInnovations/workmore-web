@@ -17,7 +17,6 @@ const Layout = ({ children, loader }) => {
 
 
 
-
   useEffect(() => {
     router.events.on("routeChangeComplete", () => loader(false));
     router.events.on("routeChangeStart", () => loader(true));
@@ -26,12 +25,9 @@ const Layout = ({ children, loader }) => {
 
   useEffect(() => {
     if (!router.isReady) return;
-
-    // const currentPath = router.asPath.split("?")[0];
-
+    
     if (!token) {
       router.replace("/");
-
     }
   }, [user, router.isReady]);
 

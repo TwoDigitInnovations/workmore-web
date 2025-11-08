@@ -19,14 +19,12 @@ export default function App({ Component, pageProps }) {
   const [cartData, setCartData] = useState([]);
   const [Favorite, setFavorite] = useState([]);
   const [openCart, setOpenCart] = useState(false);
+  
   useEffect(() => {
     setOpen(open);
   }, [open]);
 
   useEffect(() => {
-    if (router.route === "/") {
-      router.replace("/");
-    }
     getUserDetail();
   }, []);
 
